@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service-app
+  labels:
+    app: notification-service-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: notification-service-app
+  template:
+    metadata:
+      labels:
+        app: notification-service-app
+    spec:
+      containers:
+        - name: notification-service-app
+          image: notification-service
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8086
+          env:
+            - name: EUREKA_SERVER_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-server
+                  key: eureka_server_hostname
+            - name: EUREKA_SERVER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-server
+                  key: eureka_server_address
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: notification-service-svc
+spec:
+  selector:
+    app: notification-service-app
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8086

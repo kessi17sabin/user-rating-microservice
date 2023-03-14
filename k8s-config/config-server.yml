@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-server-app
+  labels:
+    app: config-server-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-server-app
+  template:
+    metadata:
+      labels:
+        app: uconfig-server-app
+    spec:
+      containers:
+        - name: config-server-app
+          image: config-server:latest
+          ports:
+            - containerPort: 8085
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: config-server-svc
+spec:
+  selector:
+    app: config-server-app
+  type: ClusterIP
+  ports:
+    - port: 80
+      targerPort: 8085
